@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  iris:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports: 
+      - "51773:51773"
+      - "80:52773"
+      - "53773:53773"
+    volumes:
+      - "~/iris.key:/usr/irissys/mgr/iris.key"
+      - "./irisapp:/usr/irissys/csp/irisapp/"
+    container_name: iris_app_container

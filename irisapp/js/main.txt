@@ -1,0 +1,256 @@
+const CAR_GET_ALL_URL = "/racetournament/car/getall";
+const CAR_DELETE_URL = "/racetournament/car/delete";
+const CAR_ADD_URL = "/racetournament/car/add";
+const CAR_EDIT_URL = "/racetournament/car/edit";
+
+const PLACE_GET_ALL_URL = "/racetournament/place/getall";
+const PLACE_DELETE_URL = "/racetournament/place/delete";
+const PLACE_ADD_URL = "/racetournament/place/add";
+const PLACE_EDIT_URL = "/racetournament/place/edit";
+
+const menu_data = [
+  {id: "tab1", icon: "mdi mdi-trophy", value:"Tournament Results"},
+  {id: "tab2", icon: "mdi mdi-car-sports", value:"Cars"},
+  {id: "tab3", icon: "mdi mdi-stadium", value:"Places"},
+  {id: "tab4", icon: "mdi mdi-flag-checkered", value:"Tours"},
+  {id: "tab5", icon: "mdi mdi-account", value:"Drivers"}
+];
+
+const startPage = {
+  id: "start_content",
+  view: "label",
+  height: '100%',
+  width: '100%',
+  label: "Welcome to the start page!",
+}
+
+// var ResultTab = {
+//   id:"tab1_content",
+//   view: "datatable",
+//   width: "500",
+//   autoConfig:true,
+//   url:"/racetournament/car/getall"
+// };
+
+var addCarFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Empty row is added", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+var saveCarFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Car is edited", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+var deleteCarFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Car is deleted", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+const carTab = {
+  id:"tab2_content",
+  autowidth: true,
+  rows: [
+    { id: "tab2_dt",
+      view: "datatable",
+      height: "500",
+      columns:[
+        { id:"id",	header:"id", width:50},
+        { id:"number", editor:"text",	header:"Number",  width:150},
+        { id:"label", editor:"text",	header:"Label", width:300},
+        { id:"power", editor:"text",	header:"Power", 	width:100}
+      ],
+      editable:true,
+      editaction:"custom",
+      select: "row",
+      on:{
+        onAfterLoad:function(){
+          if (!this.count())
+            this.showOverlay("Sorry, there is no data");
+        },
+        onItemDblClick:function(id, e, node) {
+          this.editRow(id);
+        }
+      },
+      url: CAR_GET_ALL_URL
+    },
+    { cols: [
+      { view:"button",  value:"Add Empty Row", id:"tab2_add_button", click:function(){
+          var new_row = { number: "", label: "" , power: ""};
+          $$("tab2_dt").add(new_row);
+          webix.ajax().post(CAR_ADD_URL, new_row, addCarFormCallback);
+      }},
+      { view:"button",  value:"Save Row", id:"tab2_save_button", click:function(){
+        var row_id = $$("tab2_dt").getSelectedId();
+        if(row_id) {
+          var obj = $$("tab2_dt").getSelectedItem(true);
+          var values = obj[0];
+          webix.message(`Selected to edit ${row_id} : ${values}`);
+          webix.ajax().post(CAR_EDIT_URL, values, saveCarFormCallback);
+        }
+      }},
+      { view:"button",  value:"Delete Row", id:"tab2_delete_button", click:function(){
+        var row_id = $$("tab2_dt").getSelectedId(true);
+        if(row_id) {
+          var obj = $$("tab2_dt").getSelectedItem(true);
+          var value = obj[0].id;
+          webix.message(`Selected to delete ${value}`);
+          $$("tab2_dt").remove(row_id);
+          webix.ajax().del(CAR_DELETE_URL, {id: value}, deleteCarFormCallback);
+        }
+      }}
+    ]}
+]};
+
+var addPlaceFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Empty row is added", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+var savePlaceFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Place is edited", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+var deletePlaceFormCallback = (rawData) => {
+  let data = JSON.parse(rawData);
+  let message;
+  if (data.result) {
+    message = { type:"success", text: "Place is deleted", expire: 2000};
+  }
+  else {
+    message = { type:"error", text: data.message, expire:2000};
+  }
+  webix.message(message);
+};
+
+const placeTab = {
+  id:"tab3_content",
+  autowidth: true,
+  rows: [
+    { id: "tab3_dt",
+      view: "datatable",
+      height: "500",
+      columns:[
+        { id:"id", header:"Id",  		width:50},
+        { id:"name", editor:"text",	header:"Name", width:200},
+        { id:"length", editor:"text",	header:"Length", 	width:100}
+      ],
+      editable:true,
+      editaction:"custom",
+      select: "row",
+      on:{
+        onAfterLoad:function(){
+          if (!this.count())
+            this.showOverlay("Sorry, there is no data");
+        },
+        onItemDblClick:function(id, e, node) {
+          this.editRow(id);
+        }
+      },
+      url: PLACE_GET_ALL_URL
+    },
+    { cols: [
+      { view:"button",  value:"Add Empty Row", id:"add_button", click:function(){
+          var new_row = { name: "", length: "" };
+          $$("tab3_dt").add(new_row);
+          webix.ajax().post(PLACE_ADD_URL, new_row, addPlaceFormCallback);
+      }},
+      { view:"button",  value:"Save Row", id:"save_button", click:function(){
+        var row_id = $$("tab3_dt").getSelectedId();
+        if(row_id) {
+          var obj = $$("tab3_dt").getSelectedItem(true);
+          var values = obj[0];
+          webix.message(`Selected to edit ${row_id} : ${values}`);
+          webix.ajax().post(PLACE_EDIT_URL, values, savePlaceFormCallback);
+        }
+      }},
+      { view:"button",  value:"Delete Row", id:"delete_button", click:function(){
+        var row_id = $$("tab3_dt").getSelectedId(true);
+        if(row_id) {
+          var obj = $$("tab3_dt").getSelectedItem(true);
+          var value = obj[0].id;
+          webix.message(`Selected to delete ${value}`);
+          $$("tab3_dt").remove(row_id);
+          webix.ajax().del(PLACE_DELETE_URL, {id: value}, deletePlaceFormCallback);
+        }
+      }}
+    ]}
+]};
+
+const ui_template = {
+height: '100%',
+rows: [
+  { view: "toolbar", padding:3, 
+    elements: [
+      { view: "button", type: "icon", icon: "mdi mdi-menu",
+        width: 37, align: "left", css: "app_button", click: function(){
+          $$("$sidebar1").toggle();
+          $$("start_content").show();
+        }
+      },
+      { view: "label", label: "IRIS App"}
+    ]
+  },
+  { 
+    cols:[
+    {
+      view: "sidebar",
+      data: menu_data,
+      on:{
+        onAfterSelect: function(id){
+          let value = this.getItem(id).value;
+          webix.message(`Selected ${value}`);
+          $$(`${id}_content`).show();
+        }
+      }
+    },
+    {
+      id: "contex",
+      cells: [
+        startPage,
+        carTab,
+        placeTab
+      ]
+    }
+  ]}
+]};
+
+webix.ready(function(){
+  webix.ui(ui_template);
+});

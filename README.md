@@ -1,3 +1,8 @@
+## Student IRIS Project
+Group: IU3-41M
+authors: Strakhov M.D., Ershov V.A.
+theme: Race Tournament IRIS tracker-app
+
 ## intersystems-objectscript-template
 This is a template for InterSystems ObjectScript Github repository.
 The template goes also with a few files which let you immedietly compile your ObjecScript files in InterSystems IRIS Community Edition in a docker container
