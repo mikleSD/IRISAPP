@@ -84,17 +84,24 @@ ClassMethod edit(reqObj) As %DynamicArray
 {
     set Id = reqObj.Get("id")
     set driver = ..%OpenId(Id)
-    set driver.Name = reqObj.Get("name")
-    set driver.Age = reqObj.Get("age")
-    do driver.CarSetObjectId(reqObj.Get("carId"))
-    do driver.TourSetObjectId(reqObj.Get("tourId"))
-    set saveResult = driver.%Save()
-
     set result = {}
-    if $$$ISOK(saveResult) set result = {"result": true}
-    else  set result = {"result": false}
-    set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
-    set result.message = ErrorMessage
+
+    if $IsObject(driver) {
+        set driver.Name = reqObj.Get("name")
+        set driver.Age = reqObj.Get("age")
+        do driver.CarSetObjectId(reqObj.Get("carId"))
+        do driver.TourSetObjectId(reqObj.Get("tourId"))
+        set saveResult = driver.%Save()
+    
+        if $$$ISOK(saveResult) set result = {"result": true}
+        else  set result = {"result": false}
+        set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
+        set result.message = ErrorMessage
+    } else {
+        set result = {"result": false}
+        set result.message = "Invalid Object"
+    }
+
 
     return result.%ToJSON()
 }

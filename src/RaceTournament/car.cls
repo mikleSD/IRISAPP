@@ -34,7 +34,7 @@ ClassMethod add(reqObj) As %DynamicArray
   set obj.Label = reqObj.Get("label")
   set obj.Power = reqObj.Get("power")
   set saveResult = obj.%Save()
-
+  
   if $$$ISOK(saveResult) set result = {"result": true}
   else  set result = {"result": false}
   set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
@@ -81,17 +81,23 @@ ClassMethod edit(reqObj) As %DynamicArray
 {
     set Id = reqObj.Get("id")
     set car = ..%OpenId(Id)
-    set car.Number = reqObj.Get("number")
-    set car.Label = reqObj.Get("label")
-    set car.Power = reqObj.Get("power")
-    set saveResult = car.%Save()
-
     set result = {}
-    if $$$ISOK(saveResult) set result = {"result": true}
-    else  set result = {"result": false}
-    set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
-    set result.message = ErrorMessage
 
+    if $IsObject(car) {
+        set car.Number = reqObj.Get("number")
+        set car.Label = reqObj.Get("label")
+        set car.Power = reqObj.Get("power")
+        set saveResult = car.%Save()
+        if $$$ISOK(saveResult) set result = {"result": true}
+        else  set result = {"result": false}
+        set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
+        set result.message = ErrorMessage
+    }
+    else {
+        set result = {"result": false}
+        set result.message = "Invalid object"
+    }
+    
     return result.%ToJSON()
 }
 

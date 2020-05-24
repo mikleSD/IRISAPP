@@ -83,16 +83,23 @@ ClassMethod edit(reqObj) As %DynamicArray
 {
     set Id = reqObj.Get("id")
     set tour = ..%OpenId(Id)
-    set tour.Name = reqObj.Get("name")
-    set tour.Date = $ZDateh(reqObj.Get("date"), 3)
-    do tour.PlaceSetObjectId(reqObj.Get("placeId"))
-    set saveResult = tour.%Save()
-
     set result = {}
-    if $$$ISOK(saveResult) set result = {"result": true}
-    else  set result = {"result": false}
-    set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
-    set result.message = ErrorMessage
+
+    if $IsObject(tour) {
+        set tour.Name = reqObj.Get("name")
+        set tour.Date = $ZDateh(reqObj.Get("date"), 3)
+        do tour.PlaceSetObjectId(reqObj.Get("placeId"))
+        set saveResult = tour.%Save()
+    
+        if $$$ISOK(saveResult) set result = {"result": true}
+        else  set result = {"result": false}
+        set ErrorMessage = ##class(%SYSTEM.Status).GetErrorText(saveResult)
+        set result.message = ErrorMessage
+    } else {
+        set result = {"result": false}
+        set result.message = "Invalid object"
+    }
+
 
     return result.%ToJSON()
 }
